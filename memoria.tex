@@ -568,13 +568,6 @@ En la segunda zona, sobrepasando el primer borde de control, podemos diferenciar
   \item Por último, al otro lado del firewall externo, se encuentra la red de Internet. Los agentes se encuentran en esta zona y hacen login a la plataforma desde su domicilio o desde su oficina de trabajo.
 \end{itemize}
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[scale=0.55]{img/fig_arquitectura}
-  \caption{Diseño a alto nivel de la arquitectura montada}
-  \label{figura:fig_arquitectura}
-\end{figure}
-
 \section{Alcance y casos de uso}
 \label{sec:alcance}
 Los elementos implicados en la solución son los siguientes:
@@ -585,6 +578,13 @@ Los elementos implicados en la solución son los siguientes:
   \item \textbf{Contact Center}. Servidor UCCX que aloja el aplicativo Finesse. Consta de varios nodos al estar geográficamente redundado.
   \item \textbf{Proxy}. Gateway para enrutamiento de llamadas desde internet al Call Manager. Se usa también para habilitar la funcionalidad MRA (Mobile and Remote Access).
 \end{itemize}
+
+\begin{figure}[!]
+  \centering
+  \includegraphics[scale=0.55]{img/fig_arquitectura}
+  \caption{Diseño a alto nivel de la arquitectura montada}
+  \label{figura:fig_arquitectura}
+\end{figure}
 
 \section{Configuración de los componentes}
 \label{sec:config}
@@ -599,16 +599,100 @@ Se utilizan funciones especiales en CPU x86 de 64 bits modernas para crear máqu
 
 En la Figura ~\ref{figura:fig_vmware} se presenta el aspecto de la interfaz del aplicativo con varias de las máquinas virtuales instaladas y parte de la información sensible ocultada.
 
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
   \includegraphics[scale=0.8]{img/fig_vmware}
   \caption{Interfaz web de VMWare}
   \label{figura:fig_vmware}
 \end{figure}
 
+\subsection{Multiserver}
+\label{sec:multiserver}
+Hay varias gestiones y configuraciones necesarias para complementar la solución que no se pueden hacer únicamente desde los equipos de Cisco, por lo que hubo que instalar servidores Windows y CentOS para llevarlas a cabo. Dichos servidores están representados en el esquema general de la arquitectura como el Multiserver.
+
+Servicios que han sido desplegados:
+\begin{itemize}
+  \item \textbf{DNS}. Para el despliegue de este servicio se ha optado por Windows Server. Dicho SO dispone de una herramienta llamada Server Manager, que permite la instalación y configuración de un DNS propio de Microsoft (Figura ~\ref{figura:fig_dns}). Tras seguir los pasos y finalizar la instalación, se procedieron a crear las zonas de búsqueda y los registros con los nombres que se asociaron a cada máquina virtual, también llamados FQDN (Fully Qualified Domain Name). A través de esos nombres se podrá acceder a la interfaz de gestión web de las máquinas que lo tengan habilitado. Por ejemplo, si al Call Manager se le ha asociado la FQDN ``vmcucm'' (Figura ~\ref{figura:fig_dominios}), el acceso a la gestión web de esa máquina será https://vmcucm.dominio.es. Aunque en este caso fue instalado y configurado de cero, es habitual que el DNS lo proporcione la empresa en la que se hace la instalación.
+  \item \textbf{Certificate Authority (CA)}. Una Autoridad de certificación es una entidad de confianza, responsable de emitir y revocar los certificados digitales. Un certificado es un archivo que contiene el nombre del titular del certificado, la clave pública y la firma digital de la autoridad certificadora que emite el certificado, que prueba la identidad del propietario del certificado. 
+  Mediante dichos documentos, los distintos elementos de la solución confiarán entre ellos al validar sus identidades y la comunicación será segura.
+  Esta CA se ha configurado en un SO CentOS, que es una distribucion de Linux de código abierto.
+  Los certificados están diseñados para que caduquen cada cierto tiempo, especificado a la hora de firmarlo desde la CA. Antes de que caduque un certificado, habrá que renovar su autorización con la misma entidad, o con una diferente de confianza.
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.85]{img/fig_dns}
+  \caption{Creación de DNS en Server Manager}
+  \label{figura:fig_dns}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.8]{img/fig_dominios}
+  \caption{Ejemplo de registros en el DNS}
+  \label{figura:fig_dominios}
+\end{figure}
+
+\subsection{Grabadora}
+\label{sec:grabadora}
+Se ha instalado un software de terceros que se integra con la solución de colaboración de Cisco, y que tiene acceso vía web. El panel de la grabadora proporciona una descripción completa de las llamadas por día, la duración promedio de las llamadas, las llamadas activas actuales, etc. Dicha interfaz almacena estadísticas muy detalladas (figuras ~\ref{figura:fig_portada_recorder}, ~\ref{figura:fig_grabaciones} y ~\ref{figura:fig_grabaciones_02}) que pueden ser utilizadas para una exportación con criterios de búsqueda muy ajustados.
+
+Por ejemplo, en la figura ~\ref{figura:fig_filtros} está programada una búsqueda que aúna tres criterios: que las llamadas sean posteriores al 1 de junio de 2022, que superen los 10 minutos de duración y que sean entrantes. 
+De esa manera, podemos localizar a los agentes que se estén excediendo del tiempo límite y darles una colleja.
+Estas combinaciones para las búsquedas pueden guardarse con un nombre identificativo y ahorrar mucho tiempo y trabajo en posteriores aplicaciones del mismo filtro.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[scale=0.65]{img/fig_portada_recorder}
+  \caption{Panel de resumen de la grabadora}
+  \label{figura:fig_portada_recorder}
+\end{figure}
+
+\subsubsection{Instalación}
+\label{sec:instalacion_grabadora}
+
+La instalación se ha realizado mediante una plantilla OVA, que es una máquina virtual preinstalada con sistema operativo definido (CentOS) y el software de grabación de llamadas.
+Esta plantilla es la solución ideal para este contexto, ya que su descarga es rápida al encontrarse comprimida y es fácil de importar al entorno de VMWare.
+Al no disponer de enlaces de descarga, se ha adquirido mediante petición al fabricante desde su página web.
+
+\subsubsection{Configuración}
+\label{sec:configuracion_grabadora}
+
+Se pueden separar las configuraciones realizadas en dos partes:
+\begin{enumerate}
+  \item Configuraciones en la GUI del software vía web. Desde este lado se han añadido los agentes de forma manual, los grupos a los que pertenece cada uno, los roles, los supervisores, el licenciamiento y los ajustes de almacenamiento y codificación.
+  \item Configuraciones del lado del Call Manager. Se ha habilitado un SIP Trunk directo hacia la grabadora. Se ha configurado un perfile de seguridad SIP, un perfil SIP, un perfil de grabacion y un patrón de rutas que apunta a la grabadora.
+\end{enumerate}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.65]{img/fig_grabaciones}
+  \caption{Aspecto de la interfaz de visualización de grabaciones}
+  \label{figura:fig_grabaciones}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.65]{img/fig_grabaciones_02}
+  \caption{Detalle de una grabación específica}
+  \label{figura:fig_grabaciones_02}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.65]{img/fig_filtros}
+  \caption{Ejemplo de búsqueda con criterios}
+  \label{figura:fig_filtros}
+\end{figure}
+
+
 \subsection{Call Manager}
 \label{sec:call_manager}
 
+Cisco mediante Call Manager permite una gestión de los perfiles de usuario \emph{end-point} y de los derechos basados en éstos para diversos grupos, departamentos y divisiones, gestionados por usuarios administradores.
+
+\subsection{Contact Center}
+\label{sec:contact_center}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -687,9 +771,7 @@ Aquí viene lo que has aprendido en el Trabajo Fin de Grado/Máster.
 \section{Trabajos futuros}
 \label{sec:trabajos_futuros}
 
-Ningún proyecto ni software se termina, así que aquí vienen ideas y funcionalidades que estaría bien tener implementadas en el futuro.
-
-Es un apartado que sirve para dar ideas de cara a futuros TFGs/TFMs.
+Se puede integrar un motor de transcripción de audio en el recorder.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
