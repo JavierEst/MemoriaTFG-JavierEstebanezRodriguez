@@ -30,6 +30,11 @@
 \usepackage{float}  %% H para posicionar figuras
 \usepackage[nottoc, notlot, notlof, notindex]{tocbibind} %% Opciones de índice
 \usepackage{latexsym}  %% Logo LaTeX
+\usepackage{color}
+\definecolor{red}{rgb}{1,0,0}
+\definecolor{green}{rgb}{0.3,0.6,0.1}
+%\usepackage[dvipsnames]{xcolor}
+%\usepackage[usenames]{color} %Textos en color
 
 \title{Integración de una plataforma de telefonía IP}
 \author{Javier Estébanez Rodríguez}
@@ -568,8 +573,8 @@ En la segunda zona, sobrepasando el primer borde de control, podemos diferenciar
   \item Por último, al otro lado del firewall externo, se encuentra la red de Internet. Los agentes se encuentran en esta zona y hacen login a la plataforma desde su domicilio o desde su oficina de trabajo.
 \end{itemize}
 
-\section{Alcance y casos de uso}
-\label{sec:alcance}
+\section{Diagrama general}
+\label{sec:diagrama}
 Los elementos implicados en la solución son los siguientes:
 \begin{itemize}
   \item \textbf{Call Manager}. Al ser una solucón redundada, necesitará tener un elemento \emph{master} y otro \emph{slave}.
@@ -581,9 +586,35 @@ Los elementos implicados en la solución son los siguientes:
 
 \begin{figure}[!]
   \centering
-  \includegraphics[scale=0.55]{img/fig_arquitectura}
+  \includegraphics[scale=0.6]{img/fig_arquitectura}
   \caption{Diseño a alto nivel de la arquitectura montada}
   \label{figura:fig_arquitectura}
+\end{figure}
+
+\section{Diagrama de flujo}
+\label{sec:flujo}
+
+En el siguiente diagrama, se muestra el flujo básico que siguen los dos tipos posibles de llamadas (tanto salientes como entrantes):
+\begin{enumerate}
+  \item Un \textbf{\textcolor{red}{cliente externo}} hace una llamada al número de atención telefónica. El proveedor enruta la llamada al gateway, que la redirige al Call Manager. En este momento, suceden varios flujos de ejecución:
+  \begin{itemize}
+    \item El Call Manager consulta con el Contact Center los agentes disponibles, el cual hace una asignación basada en ciertos criterios de la empresa, en conjunto con las opciones marcadas por el cliente en la locución de bienvenida si la hubiese (IVR o \emph{Interactive Voice Response}).
+    \item Comienza la comunicación entre la grabadora y el Call Manager, que acuerdan el inicio de la grabación en cuanto el agente descuelgue el teléfono y se establezca conexión, iniciando el tráfico RTP punto a punto.
+  \end{itemize}
+  En caso de sentido contrario de llamada el agente marcará la numeración telefónica de un cliente externo, lo que provocará que el call manager enrute la llamada al gateway y éste la saque por el acceso primario al proveedor. En este momento, el proveedor consultará sus tablas de numeración y enlazará la llamada con el destino.
+  \item Un \textbf{\textcolor{green}{trabajador de una empresa}} a la que da soporte esta solución llama al servicio técnico. El Call Manager de esa misma empresa enruta la llamada hacia el extremo de su red, a través del cual se conecta con nuestro elemento de borde, el SBC. Dicho SBC enruta la llamada por medio de un SIP Trunk hacia nuestro Call Manager. En este momento, suceden los mismos flujos que en la anterior casuística ren relación al Call Manager:
+  \begin{itemize}
+    \item Asignación de agente mediante Contact Center.
+    \item Grabación de llamada a través de la grabadora al comienzo de la conversación.
+  \end{itemize}
+  En caso de sentido contrario de llamada el agente marcará la numeración telefónica del trabajador, lo que provoará que el call manager enrute la llamada al SBC y este conecte con el Call Manager de la otra empresa. A partir de ahí el flujo es opaco a nosotros, pero se supone que la lógica será igual o parecida a la nuestra.
+\end{enumerate}
+
+\begin{figure}[!]
+  \centering
+  \includegraphics[scale=0.6]{img/fig_callflow}
+  \caption{Diagrama de flujo SIP general}
+  \label{figura:fig_callflow}
 \end{figure}
 
 \section{Configuración de los componentes}
@@ -617,6 +648,7 @@ Servicios que han sido desplegados:
   Mediante dichos documentos, los distintos elementos de la solución confiarán entre ellos al validar sus identidades y la comunicación será segura.
   Esta CA se ha configurado en un SO CentOS, que es una distribucion de Linux de código abierto.
   Los certificados están diseñados para que caduquen cada cierto tiempo, especificado a la hora de firmarlo desde la CA. Antes de que caduque un certificado, habrá que renovar su autorización con la misma entidad, o con una diferente de confianza.
+  \item \textbf{Cliente Windows}. Como el entorno no tiene conexión con el exterior, se necesita una herramienta para el análisis y \emph{troubleshooting}. Para ello se ha instalado una máquina virtual con Windows 10, que dispone también de un cliente de jabber y software adicional para el análisis del tráfico SIP. De esa manera se pueden hacer llamadas de prueba de forma interna, capturar paquetes o instalar herramientas de Cisco como el Real Time Monitoring Tool (RTMT), que sirve para ver y exportar los logs del Call Manager y Contact Center.
 \end{itemize}
 
 \begin{figure}
@@ -661,7 +693,7 @@ Al no disponer de enlaces de descarga, se ha adquirido mediante petición al fab
 Se pueden separar las configuraciones realizadas en dos partes:
 \begin{enumerate}
   \item Configuraciones en la GUI del software vía web. Desde este lado se han añadido los agentes de forma manual, los grupos a los que pertenece cada uno, los roles, los supervisores, el licenciamiento y los ajustes de almacenamiento y codificación.
-  \item Configuraciones del lado del Call Manager. Se ha habilitado un SIP Trunk directo hacia la grabadora. Se ha configurado un perfile de seguridad SIP, un perfil SIP, un perfil de grabacion y un patrón de rutas que apunta a la grabadora.
+  \item Configuraciones del lado del Call Manager. Se ha habilitado un SIP Trunk directo hacia la grabadora, se ha configurado un perfil de seguridad SIP, un perfil SIP, un perfil de grabacion y un patrón de rutas que apunta a la grabadora.
 \end{enumerate}
 
 \begin{figure}
@@ -694,6 +726,50 @@ Cisco mediante Call Manager permite una gestión de los perfiles de usuario \emp
 \subsection{Contact Center}
 \label{sec:contact_center}
 
+
+\subsection{Gateway}
+\label{sec:gateway}
+
+El proveedor de telefonía ha provisto de un enlace Primario o E1 con un ancho de banda total de 2048Kbps, que consta de 32 canales E0 a 64Kbps, debido a la codificación G.711, también llamada PCM analógica a digital. De esos 32 canales, 2 son para señalizacion y 30 están destinados a datos. 
+Esta velocidad de 64K parte del criterio de Nyquist, en donde se formula que para recuperar de forma digital una señal analógica y muestrearla correctamente debemos hacerlo a una tasa dos veces superior al ancho de banda. 
+Con un ancho de banda de la señal analógica de 4KHz se debe muestrear a 8KHz, que usando 8 bits por muestra da el resultado de 64Kbps. 
+
+La frecuencia máxima (banda en frecuencia limitada) en una señal analógica $x_{a}(t)$ podemos denominarla como $F_{max}$  o $B$. Si la señal se muestrea a una tasa mínima del doble de esa frencuencia, entonces $F_{s} \geq 2B$.
+
+Para la multiplexación de la señal, la técnica más utilizada en la actualidad, especialmente en la transmision de sistemas digitales, es la multiplexación por división de tiempo (TDM en inglés). Mediante esta técnica, se asignan ranuras o \emph{slots} de tiempo a cada trama de las señales originarias (figura ~\ref{figura:fig_tdm}). Este tipo de asignación fija no es la mejor forma de aprovechar el espectro disponible, ya que si un señal no está enviando datos durante un tiempo determiando (silencio), se están desperdiciando ranuras. Sin embargo, este inconveniente no sucede en el mundo digital, donde el total del ancho de banda se reasigna de forma dinámica en los recursos que lo necesiten.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.7]{img/fig_tdm}
+  \caption{Ejemplo de multiplexación TDM}
+  \label{figura:fig_tdm}
+\end{figure}
+
+En este contexto, el Gateway de voz es un elemento imprescindible para el funcionamiento de un sistema de Voz IP con conexión a la red pública, pues es el responsable de hacer la traducción entre el mundo interno digital y el externo analógico a través de sus puertos FXO (\emph{Foreign eXchange Office}). Su trabajo es convertir la señal analógica multiplexada en TDM, a una paquetización para el envío a través de una red IP. De forma análoga, un gateway también realiza el proceso contrario: convierte los paquetes digitales a tráfico TDM para transportarlos a través de la PSTN.
+
+Para esta labor, la reconstrucción de la señal analógica es matemáticamente posible a partir de las muestras de la señal digital. Se realiza un sumatorio de todas las muestras y, mediante una función de interpotalción que define la naturaleza del sistema interpolado, se obtiene la siguiente ecuación:
+
+\[
+x_{a}(t) = \sum_{n=\infty}^\infty x_{(n)}i(t-nt_{s})
+\]
+
+Donde $x_{(n)}$ es la función discreta, e $i(t-nt_{s})$ es la funcion de interpolación que define el desfase de cada impulso.
+
+Existen dos gateways redundados geográficamente, los cuales disponen de una conexión E1 independiente contra el proveedor telefónico. En el momento en el que se realiza una llamada entrante al sistema, el proveedor posee dos alternativas para la entrega de la llamada a los gateways:
+
+\begin{enumerate}
+  \item \textbf{Activo/Activo}, configuración que envía las llamadas por ambos gateways simultáneamente. Bajo ciertos criterios de decisión, como por ejemplo la carga de llamadas en cada localización o la congestión existente en el par de cobre, el proveedor decidirá balancear las llamadas y entregarlas a uno u otro.
+  \item \textbf{Activo/Pasivo}, lógica que entrega las llamadas siempre al mismo gateway. En el momento en que haya una caída y no responda, su sistema de \emph{health check} descubrirá que la conexión con el primer gateway está caída, por lo que comenzará a enrutar las llamadas hacia el segundo. Este cambio de enrutamiento debería llevarse a cabo idealmente en apenas unos segundos.
+\end{enumerate}
+
+En el caso que mencionaba al inicio de este subcapítulo, hablaba del uso de G.711 en los canales previos a la multiplexación, pues es uno de los estándares de la ITU-T más usados en telefonía. Sin embargo, cada red privada tiene a su disposición la elección de códec destinado a sus comunicaciones internas, lo que puede provocar disconformidad a la hora de enrutar llamadas al exterior o a otras redes privadas. 
+Para solventar este inconveniente, el gateway es capaz también de realizar una transcodificación de la señal entrante y adaptarla al medio de destino, de manera que ambos extremos hablen el mismo ``idioma''. Dicha transcodificación no ha sido necesaria entre nuestra red privada y la PSTN al utilizar ambos la misma codificación, sin embargo si ha sido imperativa su implementación para la comunicación con los entornos de las otras empresas separadas por el SBC, aunque es éste el que se encarga en este caso de realizar dichas transcodificaciones.
+
+\subsection{Session Border Controller}
+\label{sec:sbc}
+
+La seguridad de los entornos empresariales es un factor indispensable a la hora de planear una arquitectura que abra sus puertas a conexiones externas, es por ello que los firewalls son elementos necesarios en estas soluciones. Sin embargo, su operatividad está basada en NAT, algo incompatible con el tráfico VoIP.
+Para solventarlo, existen unos elementos llamados SBC, que
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -772,6 +848,7 @@ Aquí viene lo que has aprendido en el Trabajo Fin de Grado/Máster.
 \label{sec:trabajos_futuros}
 
 Se puede integrar un motor de transcripción de audio en el recorder.
+Se puede hacer una configuracion en HA de los gateways, para que las llamadas activas no se caigan. diferencias entre georedundancia y HA.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
