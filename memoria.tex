@@ -723,6 +723,8 @@ Se pueden separar las configuraciones realizadas en dos partes:
 
 Cisco mediante Call Manager permite una gestión de los perfiles de usuario \emph{end-point} y de los derechos basados en éstos para diversos grupos, departamentos y divisiones, gestionados por usuarios administradores.
 
+Para que las llamadas se clasifiquen correctamente y se distribuyan a través del elemento que corresponda, como por ejemplo en este caso el SBC, existen unas políticas configuradas en el Call Manager
+
 \subsection{Contact Center}
 \label{sec:contact_center}
 
@@ -769,7 +771,30 @@ Para solventar este inconveniente, el gateway es capaz también de realizar una 
 \label{sec:sbc}
 
 La seguridad de los entornos empresariales es un factor indispensable a la hora de planear una arquitectura que abra sus puertas a conexiones externas, es por ello que los firewalls son elementos necesarios en estas soluciones. Sin embargo, su operatividad está basada en NAT, algo incompatible con el tráfico VoIP.
-Para solventarlo, existen unos elementos llamados SBC, que
+Para solventarlo, se ha implementado un elemento llamado SBC, que toma parte activa y actúa de firewall de voz, impidiendo conexiones ilícitas y bloqueando intrusiones. Este elemento está conectado directamente contra el Call Manager, transcodificando también las llamadas al códec que se usa en el Call Manager destino (figura ~\ref{figura:fig_sbc}). Cada enlace a los clientes de esta empresa está definido mediante un SIP Trunk, que dispone de su propio puerto físico en el SBC.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.6]{img/fig_sbc}
+  \caption{Flujo de llamadas a través de un SBC}
+  \label{figura:fig_sbc}
+\end{figure}
+
+Cuando una llamada entrante desde el Call Manager posee un patrón en el número marcado, si este patrón hace match con uno registrado en el SBC, es entonces cuando se enruta la llamada por el puerto correspondiente hacia su destino.
+Por ejemplo, si un agente de la empresa marca la extensión de un usuario de un cliente precedida por un patrón numérico, ese patrón es detectado por las políticas de enrutado configuradas en el Call Manager, que enviará la llamada al SBC. El SBC comparará el patrón con su tabla de destinos, y con el que coincida la numeración es con quien creará el enlace.
+
+Una función muy interesante y que está siendo de mucha utilidad es la posibilidad de manipulación de mensajes. Se puede analizar la cabecera de una petición http y adaptar los parámetros de nuestro interés. Entre otras manipulaciones, se ha aplicado una que modifica la cantidad de reenvíos máximos permitidos de la petición:
+
+\begin{verbatim}
+MATCH
+Message Type: any		
+Condition:	header.request-uri.methodtype == '8'
+
+ACTION
+Action Subject:	header.max-forwards.val	
+Action Type:	Modify	
+Action Value:	'10'
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
