@@ -727,12 +727,22 @@ Se pueden separar las configuraciones realizadas en dos partes:
 
 La solución cuenta con varios Call Manager:
 \begin{itemize}
-  \item CUCM (Cisco Unified Call Manager). Entre todos los que hay instalados, uno es el que tiene el papel principal y actúa de \emph{master}. En él se realizarán los cambios, que serán propagados al resto de Call Managers. Además, hay otros dos CUCM más que actúan de \emph{subscriber}, redundando así la solución para tener mayor capacidad de usuarios y llamadas y también ganar robustez frente a caídas de servicio.
+  \item CUCM (Cisco Unified Call Manager). Entre todos los que hay instalados, uno es el que tiene el papel principal y actúa de \emph{master}o también llamado \emph{publisher}. En él se realizarán los cambios, que serán propagados al resto de Call Managers. Además, hay otros dos CUCM más que actúan de \emph{subscriber}, redundando así la solución para tener mayor capacidad de usuarios y llamadas y también ganar robustez frente a caídas de servicio.
   \item CUCM IM\&P (Cisco Unified Call Manager Instant Messaging and Presence), que son los encargados de proveer del servicio de presencia en la aplicación de mensajería (offline, online, ausente...) mediante el protocolo XMPP (\emph{Extensible Messaging and Presence Protocol}). También existen varios para redundancia, aunque al tratarse de una versión alternativa de Call Manager, ambos actúan como \emph{subscribers}.
   Es en estos elementos donde se habilita la mensajería instantánea entre agentes de la organización. Para añadir la característica de chat persistente (que se mantenga entre sesiones), se ha integrado la base de datos SQL Server que se desplegó en el servidor de Windows y también se ha configurado una ruta de la máquina con CentOS para el almacenamiento de imágenes, texto y metadatos.
 \end{itemize}
 
-En 
+\subsubsection{Configuraciones}
+\label{sec:conf_cucm}
+En el Call Manager \emph{publisher} se han realizado los ajustes más importantes y esenciales para el funcionamiento del entorno.
+\begin{enumerate}
+  \item Activación de servicios, tales como el DHCP que provee de IP automáticamente a los agentes que se registran o el TFTP que provee de la última actualización de software a los dispositivos de cisco, entre otros muchos servicios.
+  \item \emph{Device Pools}, que establecen un orden de prioridad entre todos los Call Manager de la solución sobre los que se registrarán los agentes. De esta manera se balancea la carga de usuarios y se puede liberar el publisher de capacidad de procesamiento, ya que será el que se ocupará de alojar los servicios más importantes.
+  \item Particiones y \emph{Calling Search Spaces}, que identifican cada agente en un grupo determinado con una serie de privilegios de llamada concretos.
+  \item \emph{Route Patterns}, que consisten en una cadena de dígitos y un conjunto de manipulaciones de dígitos que enrutan llamadas a una \emph{Route List} o a un Gateway. Estos patrones son muy útiles, pues brindan una gran flexibilidad en el diseño de la red. Además, trabajan en conjunto con filtros de ruta y listas de rutas para dirigir llamadas a dispositivos específicos y para incluir, excluir o modificar patrones de dígitos.
+  \item 
+\end{enumerate}
+
 
 Cisco mediante Call Manager permite una gestión de los perfiles de usuario \emph{end-point} y de los derechos basados en éstos para diversos grupos, departamentos y divisiones, gestionados por usuarios administradores.
 
