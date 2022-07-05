@@ -644,10 +644,14 @@ Hay varias gestiones y configuraciones necesarias para complementar la solución
 Servicios que han sido desplegados:
 \begin{itemize}
   \item \textbf{DNS}. Para el despliegue de este servicio se ha optado por Windows Server. Dicho SO dispone de una herramienta llamada Server Manager, que permite la instalación y configuración de un DNS propio de Microsoft (Figura ~\ref{figura:fig_dns}). Tras seguir los pasos y finalizar la instalación, se procedieron a crear las zonas de búsqueda y los registros con los nombres que se asociaron a cada máquina virtual, también llamados FQDN (Fully Qualified Domain Name). A través de esos nombres se podrá acceder a la interfaz de gestión web de las máquinas que lo tengan habilitado. Por ejemplo, si al Call Manager se le ha asociado la FQDN ``vmcucm'' (Figura ~\ref{figura:fig_dominios}), el acceso a la gestión web de esa máquina será https://vmcucm.dominio.es. Aunque en este caso fue instalado y configurado de cero, es habitual que el DNS lo proporcione la empresa en la que se hace la instalación.
+  
+  También se ha instalado en este sistema una base de datos Microsoft SQL Server, que se explicará más adelante cuál es su utilidad.
+
   \item \textbf{Certificate Authority (CA)}. Una Autoridad de certificación es una entidad de confianza, responsable de emitir y revocar los certificados digitales. Un certificado es un archivo que contiene el nombre del titular del certificado, la clave pública y la firma digital de la autoridad certificadora que emite el certificado, que prueba la identidad del propietario del certificado. 
   Mediante dichos documentos, los distintos elementos de la solución confiarán entre ellos al validar sus identidades y la comunicación será segura.
   Esta CA se ha configurado en un SO CentOS, que es una distribucion de Linux de código abierto.
-  Los certificados están diseñados para que caduquen cada cierto tiempo, especificado a la hora de firmarlo desde la CA. Antes de que caduque un certificado, habrá que renovar su autorización con la misma entidad, o con una diferente de confianza.
+  Este elemento se ha desplegado con unas especificaciones poco exigentes pero con bastante almacenamiento pues su obejtivo será, ademas de actuar de entidad certificadora, el de almacenar los datos de los chats persistentes y las imágenes que los agentes se envíen entre sí.
+
   \item \textbf{Cliente Windows}. Como el entorno no tiene conexión con el exterior, se necesita una herramienta para el análisis y \emph{troubleshooting}. Para ello se ha instalado una máquina virtual con Windows 10, que dispone también de un cliente de jabber y software adicional para el análisis del tráfico SIP. De esa manera se pueden hacer llamadas de prueba de forma interna, capturar paquetes o instalar herramientas de Cisco como el Real Time Monitoring Tool (RTMT), que sirve para ver y exportar los logs del Call Manager y Contact Center.
 \end{itemize}
 
@@ -721,6 +725,15 @@ Se pueden separar las configuraciones realizadas en dos partes:
 \subsection{Call Manager}
 \label{sec:call_manager}
 
+La solución cuenta con varios Call Manager:
+\begin{itemize}
+  \item CUCM (Cisco Unified Call Manager). Entre todos los que hay instalados, uno es el que tiene el papel principal y actúa de \emph{master}. En él se realizarán los cambios, que serán propagados al resto de Call Managers. Además, hay otros dos CUCM más que actúan de \emph{subscriber}, redundando así la solución para tener mayor capacidad de usuarios y llamadas y también ganar robustez frente a caídas de servicio.
+  \item CUCM IM\&P (Cisco Unified Call Manager Instant Messaging and Presence), que son los encargados de proveer del servicio de presencia en la aplicación de mensajería (offline, online, ausente...) mediante el protocolo XMPP (\emph{Extensible Messaging and Presence Protocol}). También existen varios para redundancia, aunque al tratarse de una versión alternativa de Call Manager, ambos actúan como \emph{subscribers}.
+  Es en estos elementos donde se habilita la mensajería instantánea entre agentes de la organización. Para añadir la característica de chat persistente (que se mantenga entre sesiones), se ha integrado la base de datos SQL Server que se desplegó en el servidor de Windows y también se ha configurado una ruta de la máquina con CentOS para el almacenamiento de imágenes, texto y metadatos.
+\end{itemize}
+
+En 
+
 Cisco mediante Call Manager permite una gestión de los perfiles de usuario \emph{end-point} y de los derechos basados en éstos para diversos grupos, departamentos y divisiones, gestionados por usuarios administradores.
 
 Para que las llamadas se clasifiquen correctamente y se distribuyan a través del elemento que corresponda, como por ejemplo en este caso el SBC, existen unas políticas configuradas en el Call Manager
@@ -783,7 +796,7 @@ Para solventarlo, se ha implementado un elemento llamado SBC, que toma parte act
 Cuando una llamada entrante desde el Call Manager posee un patrón en el número marcado, si este patrón hace match con uno registrado en el SBC, es entonces cuando se enruta la llamada por el puerto correspondiente hacia su destino.
 Por ejemplo, si un agente de la empresa marca la extensión de un usuario de un cliente precedida por un patrón numérico, ese patrón es detectado por las políticas de enrutado configuradas en el Call Manager, que enviará la llamada al SBC. El SBC comparará el patrón con su tabla de destinos, y con el que coincida la numeración es con quien creará el enlace.
 
-Una función muy interesante y que está siendo de mucha utilidad es la posibilidad de manipulación de mensajes. Se puede analizar la cabecera de una petición http y adaptar los parámetros de nuestro interés. Entre otras manipulaciones, se ha aplicado una que modifica la cantidad de reenvíos máximos permitidos de la petición:
+Además de las funciones ya mencionadas, otra muy interesante y que está siendo de mucha utilidad es la posibilidad de manipulación de mensajes. Se puede analizar la cabecera de una petición http y adaptar los parámetros de nuestro interés. Entre otras manipulaciones, se ha aplicado una que modifica la cantidad de reenvíos máximos permitidos de la petición:
 
 \begin{verbatim}
 MATCH
@@ -795,6 +808,11 @@ Action Subject:	header.max-forwards.val
 Action Type:	Modify	
 Action Value:	'10'
 \end{verbatim}
+
+Por último, tras una configuración completa del SBC primario, se procedió a instalar un segundo en otro CPD de manera que, al igual que el resto de elementos de la solución, diponga de redundancia. Sin embargo, este tipo de redundancia es un poco especial, pues se ha configurado de tal manera que si se cae el servicio en alguno de los dos SBC las llamadas en curso no se cortarán, sino que sufrirán un silencio de pocos segundos y se reestablecerá la conexión, conduciendo el flujo de la llamada por el segundo SBC. Este tipo de redundancia se denomina \emph{High Availability} (HA) o Alta Disponibildiad en castellano.
+
+La Alta Disponibilidad se diferencia de la redundancia básica porque ofrece un servicio de sustitución casi inmediato, impidiendo que se produzca un corte en el servicio aunque sea de pocos minutos. En esta configuración, ambos SBC comparten la misma IP, testigo que se turnan estos sistemas cuando uno de ellos está caído. Así, las llamadas de los elementos externos no tienen que cambiar de destino, ya que realmente la IP no ha cambiado sino que ha tomado el relevo el elemento funcional de los dos.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
