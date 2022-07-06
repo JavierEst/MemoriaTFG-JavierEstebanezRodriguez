@@ -350,7 +350,7 @@ El objetivo general de este proyecto consiste en idear e implementar una soluci�
 Para lograr que el diseño sea adecuado, he definido una serie de objetivos específicos que se desean alcanzar:
 
 \begin{itemize}
-  \item Instalación física de los servidores y demás elementos en los CPDs correspondientes, es decir, trasladarlos a sus ubicaciones finales en las instalaciones del cliente.
+  \item Instalación física de los servidores y demás elementos en los CPDs (Centro de Procesamiento de Datos) correspondientes, es decir, trasladarlos a sus ubicaciones finales en las instalaciones del cliente.
   
   \item Instalación de los aplicativos de software en los servidores. Proveer de configuraciones de red a los equipos y realizar las instalaciones de los sistemas operativos necesarias.
 
@@ -384,7 +384,7 @@ De forma un poco resumida, puedo decir que la totalidad del proyecto ocupó unos
   
   \item Reuniones de planificación con el cliente, reuniones diarias de seguimiento y reuniones extraordinarias de resolución de conflictos o discrepancias en la organización. Diseños iniciales, revisiones y remates posteriores a dichos diseños.
 
-  \item Inventariado de todos los elementos, tanto físicos como virtuales. Datos de acceso, diagramas de la arquitectura, números de serie, IPs de cada máquina y licencias, localizaciones físicas en los RACs, flujos de servicio con sus protocolos, traducciones de DNS\ldots Se aprovechó la semana que tardaron los equipos en llegar y ser instalados en el cliente para comenzar con estos trabajos. Dichos documentos se fueron actualizando también a medida que se fue avanzando en el proyecto.
+  \item Inventariado de todos los elementos, tanto físicos como virtuales. Datos de acceso, diagramas de la arquitectura, números de serie, IPs de cada máquina y licencias, localizaciones físicas en los racks\footnote{Armario con base y estructura metálica pensado para alojar sistemas informáticos}, flujos de servicio con sus protocolos y traducciones de DNS (\emph{Domain Name System}), entre otros. Se aprovechó la semana que tardaron los equipos en llegar y ser instalados en el cliente para comenzar con estos trabajos. Dichos documentos se fueron actualizando también a medida que se fue avanzando en el proyecto.
 
   \item Configuraciones de los equipos. En el Capítulo 4 hablaré más detenidamente de cada elemento y su papel en el entorno, pero de forma resumida podemos decir que el Call Manager (CUCM) y el Contact Center (UCCX) acapararon la mayor parte del tiempo en configuraciones, seguidos muy de cerca por el Session Border Controller (SBC). Durante aproximadamente un mes se estuvieron haciendo configuraciones, en jornada laboral a tiempo completo, con horas extras como medida de urgencia.
 
@@ -413,7 +413,7 @@ El aumento del ancho de banda con el paso de los años y la naturaleza actual de
 El estándar VoIP consigue un encapsulamiento de la voz para enviarlo por circuitos no conmutados, creando un circuito virtual y aprovechándolo para el envío de múltiples conversaciones paquetizadas y en flujos independientes, puediendo además aprovechar al máximo los recursos que le ofrece el medio, por ejemplo cuando en una conversación se produce un silencio y esos recursos sobrantes se reutilizan para ``alimentar'' al resto de flujos activos. 
 No así es el caso de la red de telefonía pública (PSTN), que reserva los recursos y crea un circuito físico punto a punto cuando se establece una llamada y en el tiempo que dura la misma, impidiendo un aprovechamiento eficiente.
 
-En este aspecto, las plataformas internas de telefonía IP conectadas a la red pública para permitir llamadas entrantes y salientes, comunmente llamadas PABX, se han ido expandiendo, convirtiéndose en un elemento imprescindible en muchos casos. 
+En este aspecto, las plataformas internas de telefonía IP conectadas a la red pública para permitir llamadas entrantes y salientes, comunmente llamadas PABX (\emph{Private Automatic Branch Exchange}), se han ido expandiendo, convirtiéndose en un elemento imprescindible en muchos casos. 
 
 \section{Tecnologías actuales}
 \label{sec:tecnologias-actuales}
@@ -421,7 +421,7 @@ En este aspecto, las plataformas internas de telefonía IP conectadas a la red p
 La tecnologías más usadas actualmente en telefonía IP son los protocolos SIP (Session Initiation Protocol) y H323, diseñados ambos en 1996.
 \begin{itemize}
   \item  \textbf{SIP}. Protocolo creado y gestionado por la Internet Engeneering Task Force (IETF), organización internacional abierta de normalización. SIP se basa en el establecimiento de llamadas P2P, donde los usuarios o agentes inician la sesión. Su flujo de peticiones es muy similar al de HTTP, y soporta la negociación de parámetros, codificación y y envío de datos por protocolo RTP/RTCP.
-  \item \textbf{H323}. Creado por la Unión Internacional de Telecomunicaciones (ITU) y diseñado, al igual que SIP, para proveer sesiones de comunicación audiovisual a través de la red (RTP). Su funcionamiento es muy parecido al de SIP, pero con pequeñas diferencias.
+  \item \textbf{H.323}. Creado por la Unión Internacional de Telecomunicaciones (ITU) y diseñado, al igual que SIP, para proveer sesiones de comunicación audiovisual a través de la red (RTP). Su funcionamiento es muy parecido al de SIP, pero con pequeñas diferencias.
   \\
   \begin{figure}[h]
     \centering
@@ -431,9 +431,13 @@ La tecnologías más usadas actualmente en telefonía IP son los protocolos SIP 
   \end{figure}
 \end{itemize}
 
-En la actualidad existen cientos de códecs, muchos de ellos propietarios. SIP usa Session Description Protocol (SDP), que define en la cabecera de los mensajes de una conversación SIP todos los códeds soportados, los cuales están identificados por una cadena de caracteres y pueden ser registrados por cualquier persona. Esto hace que SIP pueda funcionar con cualquier códec. 
+Los protocolos RTP (\emph{Real-time Transport Protocol}) y RTCP (\emph{Real Time Control Protocol}) involucrados en las sesiones SIP y H.323 son los responsables de la transmisión fiable de voz y vídeo a travez de Internet. RTP es el encargado de la transmisión de datos, mientras que RTCP proporciona informacion de control complementaria al flujo de datos RTP. Debido a su naturaleza, este protocolo utiliza UDP (\emph{User Datagram Protocol}) a nivel de transporte, pues necesita un flujo constante de datos y gran ancho de banda para reducir el tiempo de envío de los paquetes.
 
-H323 se caracteriza sin embargo por requerir que cada códec esté registrado y estandarizado de forma centralizada, hecho que repercute en pequeñas desarrolladoras y universidades pues muchos traen propiedad intelectual; no existen los códecs sub-28.8Kb/s gratis que puedan ser usados en un sistema H323. Por todo ello, y gracias a su facilidad de implementación y adaptabilidad a la naturaleza evolutiva de Internet, SIP está ganando gran populariad, siendo el protocolo de elección en las soluciones de Cisco y Microsoft, entre otros. Además su  ``interfaz'' amigable al lenguaje humano permite hacer \emph{debugging} con mayor facilidad y legibilidad. 
+Para estas labores de envío de datos juegan un papel fundamental los códecs. El objetivo de un códec de audio es comprimir la señal para reducir la cantidad de bits a enviar, de manera que en la recepción se pueda descomprimir y obtener una señal lo más parecida posible a la original. Este proceso de codificar/decodificar facilita el envío de datos para conseguir una mayor cantidad de paquetes aprovechando el ancho de banda disponible.
+
+En la actualidad existen cientos de códecs, muchos de ellos propietarios. SIP usa Session Description Protocol (SDP), que define en la cabecera de los mensajes de una conversación SIP todos los códeds soportados, los cuales están identificados por una cadena de caracteres y pueden ser registrados por cualquier persona. Esto hace que SIP pueda funcionar con cualquier códec.
+
+H.323 se caracteriza sin embargo por requerir que cada códec esté registrado y estandarizado de forma centralizada, hecho que repercute en pequeñas desarrolladoras y universidades pues muchos traen propiedad intelectual; no existen los códecs sub-28.8Kb/s gratis que puedan ser usados en un sistema H.323. Por todo ello, y gracias a su facilidad de implementación y adaptabilidad a la naturaleza evolutiva de Internet, SIP está ganando gran populariad, siendo el protocolo de elección en las soluciones de Cisco y Microsoft, entre otros. Además su  ``interfaz'' amigable al lenguaje humano permite hacer \emph{debugging} con mayor facilidad y legibilidad.
 Ambos protocolos son muy usados no obstante.
 \\
 
@@ -734,30 +738,32 @@ La solución cuenta con varios Call Manager:
 
 \subsubsection{Configuraciones}
 \label{sec:conf_cucm}
-En el Call Manager \emph{publisher} se han realizado los ajustes más importantes y esenciales para el funcionamiento del entorno.
+En el Call Manager \emph{publisher} se han realizado los ajustes más importantes y esenciales para el funcionamiento del entorno. A continuación se enumeran los más importantes y su propósito:
 \begin{enumerate}
   \item Activación de servicios, tales como el DHCP que provee de IP automáticamente a los agentes que se registran o el TFTP que provee de la última actualización de software a los dispositivos de cisco, entre otros muchos servicios.
-  \item \emph{Device Pools}, que establecen un orden de prioridad entre todos los Call Manager de la solución sobre los que se registrarán los agentes. De esta manera se balancea la carga de usuarios y se puede liberar el publisher de capacidad de procesamiento, ya que será el que se ocupará de alojar los servicios más importantes.
+  \item \emph{Device Pools}, que establecen un orden de prioridad entre todos los Call Manager de la solución sobre los que se registrarán los agentes. De esta manera se balancea la carga de usuarios y se podrá liberar opcionalmente el publisher de capacidad de procesamiento, ya que será el que se ocupará de alojar los servicios más importantes.
   \item Particiones y \emph{Calling Search Spaces}, que identifican cada agente en un grupo determinado con una serie de privilegios de llamada concretos.
-  \item \emph{Route Patterns}, que consisten en una cadena de dígitos y un conjunto de manipulaciones de dígitos que enrutan llamadas a una \emph{Route List} o a un Gateway. Estos patrones son muy útiles, pues brindan una gran flexibilidad en el diseño de la red. Además, trabajan en conjunto con filtros de ruta y listas de rutas para dirigir llamadas a dispositivos específicos y para incluir, excluir o modificar patrones de dígitos.
-  \item 
+  \item \emph{Route Patterns}, que consisten en una cadena de dígitos y un conjunto de manipulaciones de dígitos que enrutan llamadas a un SIP Trunk. Estos patrones son muy útiles, pues brindan una gran flexibilidad en el diseño de la red. Además, trabajan en conjunto con filtros de ruta y listas de rutas para dirigir llamadas a dispositivos específicos y para incluir, excluir o modificar patrones de dígitos.
+  \item Extensiones, que serán el número de teléfono interno de cada agente. Cada extensión estará asociada a un dispositivo, que será el PC con el que se conecte cada uno desde su localización. Cada dispositivo configurado consume una licencia de Call Manager, por lo que habrá tantas como agentes hubiera, teniendo en cuenta que cada uno utilizará únicamente su PC como dispositivo de registro.
+  \item \emph{Music on Hold} y \emph{announcements}, que serán las locuciones de bienvenida y la música que se reproduzca cuando el llamante quede en espera a que un agente descuelgue.
+  \item \emph{CTI Route Point} (Computer Integrated xxxxxx), 
+  \item \emph{SIP Trunk} o troncal SIP, es una conexión virtual a través de internet que se crea entre dos elementos para el tráfico de voz, principalmente. Se ha creado uno hacia cada elemento que tiene un rol en el tráfico de voz, es decir: los gateways, SBCs, el CUCM IM\&P y la grabadora. En resumidas cuentas, a estos enlaces se les asocia una IP de destino y un perfil SIP, junto a otros aspectos como el método de entrega de DTMF (Dial Tone Multi Frecuency)\footnote{Tono que se genera al pulsar las teclas de marcado.} en RFC 2833. Esta especificación de entrega de DTMF establece un formato de payload de RTP para el soporte de marcación de dígitos, en este caso la marcacion a la que invitan las locuciones de bienvenida.
+  \item Usuarios, que tendrán especificados el nombre y apellidos y las credenciales para loguearse a la plataforma. También tienen un dispositivo vinculado creado anteriormente, junto a dos extensiones: la interna y la IPCC, que será la asociada al Contact Center.
 \end{enumerate}
 
-
 Cisco mediante Call Manager permite una gestión de los perfiles de usuario \emph{end-point} y de los derechos basados en éstos para diversos grupos, departamentos y divisiones, gestionados por usuarios administradores.
-
-Para que las llamadas se clasifiquen correctamente y se distribuyan a través del elemento que corresponda, como por ejemplo en este caso el SBC, existen unas políticas configuradas en el Call Manager
 
 \subsection{Contact Center}
 \label{sec:contact_center}
 
 
+
 \subsection{Gateway}
 \label{sec:gateway}
 
-El proveedor de telefonía ha provisto de un enlace Primario o E1 con un ancho de banda total de 2048Kbps, que consta de 32 canales E0 a 64Kbps, debido a la codificación G.711, también llamada PCM analógica a digital. De esos 32 canales, 2 son para señalizacion y 30 están destinados a datos. 
+El proveedor de telefonía ha provisto de un enlace Primario o E1 con un ancho de banda total de 2048Kbps, que consta de 32 canales E0 a 64Kbps, debido a la codificación G.711. De esos 32 canales, 2 son para señalizacion y 30 están destinados a datos. 
 Esta velocidad de 64K parte del criterio de Nyquist, en donde se formula que para recuperar de forma digital una señal analógica y muestrearla correctamente debemos hacerlo a una tasa dos veces superior al ancho de banda. 
-Con un ancho de banda de la señal analógica de 4KHz se debe muestrear a 8KHz, que usando 8 bits por muestra da el resultado de 64Kbps. 
+Con un ancho de banda de la señal analógica de 4KHz se debe muestrear a 8KHz, que usando 8 bits por muestra da el resultado de 64Kbps.
 
 La frecuencia máxima (banda en frecuencia limitada) en una señal analógica $x_{a}(t)$ podemos denominarla como $F_{max}$  o $B$. Si la señal se muestrea a una tasa mínima del doble de esa frencuencia, entonces $F_{s} \geq 2B$.
 
@@ -774,10 +780,12 @@ En este contexto, el Gateway de voz es un elemento imprescindible para el funcio
 
 Para esta labor, la reconstrucción de la señal analógica es matemáticamente posible a partir de las muestras de la señal digital. Se realiza un sumatorio de todas las muestras y, mediante una función de interpotalción que define la naturaleza del sistema interpolado, se obtiene la siguiente ecuación:
 
+\large
 \[
-x_{a}(t) = \sum_{n=\infty}^\infty x_{(n)}i(t-nt_{s})
+  x_{a}(t) = \sum_{n=\infty}^\infty x_{(n)}i(t-nt_{s})
 \]
-
+\\
+\normalsize
 Donde $x_{(n)}$ es la función discreta, e $i(t-nt_{s})$ es la funcion de interpolación que define el desfase de cada impulso.
 
 Existen dos gateways redundados geográficamente, los cuales disponen de una conexión E1 independiente contra el proveedor telefónico. En el momento en el que se realiza una llamada entrante al sistema, el proveedor posee dos alternativas para la entrega de la llamada a los gateways:
@@ -798,7 +806,7 @@ Para solventarlo, se ha implementado un elemento llamado SBC, que toma parte act
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.6]{img/fig_sbc}
+  \includegraphics[scale=0.55]{img/fig_sbc}
   \caption{Flujo de llamadas a través de un SBC}
   \label{figura:fig_sbc}
 \end{figure}
@@ -823,6 +831,14 @@ Por último, tras una configuración completa del SBC primario, se procedió a i
 
 La Alta Disponibilidad se diferencia de la redundancia básica porque ofrece un servicio de sustitución casi inmediato, impidiendo que se produzca un corte en el servicio aunque sea de pocos minutos. En esta configuración, ambos SBC comparten la misma IP, testigo que se turnan estos sistemas cuando uno de ellos está caído. Así, las llamadas de los elementos externos no tienen que cambiar de destino, ya que realmente la IP no ha cambiado sino que ha tomado el relevo el elemento funcional de los dos.
 
+\subsection{Monitorización}
+\label{sec:monitoring}
+
+Muchas organizaciones necesitan llevar un control en directo de sus sistemas para comprobar que funcionan correctamente y con el objetivo de conseguir una conexión permanente y sin caídas. Es el caso de la empresa en la que se ha implementado este proyecto, pues es primordial que el servicio que ofrece se vea afectado lo mínimo posible por imprevistos. Mediante protocolo SNMP (\emph{Simple Network Management Protocol}), un administrador red es capaz de realizar un \emph{health check} y consultar o modificar ciertos servicios de cada máquina del entorno. Para ello, se configura una cadena de caracteres llamada \emph{Community String}, compatible con versiones de SNMPv1 y SNMPv2.
+
+Cuando se envía la \emph{Community String} correcta al dispositivo de la red, el dispositivo devuelve un conjunto de datos depurados al administrador de red. Se puede configurar una cadena pública, que actúa como una solicitud de "solo lectura", lo que permite que el administrador consulte, pero no modifique, el dispositivo remoto. La cadena privada es una opción más potente que permite al administrador leer y escribir en el sistema remoto.
+
+Para llevar a cabo las consultas SNMP, se pueden emplear varios programas, como por ejemplo:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
