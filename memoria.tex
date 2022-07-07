@@ -33,6 +33,7 @@
 \usepackage{color}
 \definecolor{red}{rgb}{1,0,0}
 \definecolor{green}{rgb}{0.3,0.6,0.1}
+\definecolor{blue}{rgb}{0.2,0.2,0.8}
 %\usepackage[dvipsnames]{xcolor}
 %\usepackage[usenames]{color} %Textos en color
 
@@ -139,7 +140,7 @@ Fuenlabrada, a \qquad$\;\,$ de julio de 2022
 \chapter*{}
 \pagenumbering{Roman} % para comenzar la numeracion de paginas en numeros romanos
 \begin{flushright}
-\textit{Dedicado a mi familia y a mi pareja}
+\textit{Dedicado a mis padres y a mi pareja}
 \end{flushright}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,9 +150,14 @@ Fuenlabrada, a \qquad$\;\,$ de julio de 2022
 %\addcontentsline{toc}{chapter}{Agradecimientos} % si queremos que aparezca en el índice
 \markboth{AGRADECIMIENTOS}{AGRADECIMIENTOS} % encabezado
 
-Aquí vienen los agradecimientos\ldots Aunque está bien acordarse de la pareja, no hay que olvidarse de dar las gracias a tu madre, que aunque a veces no lo parezca disfrutará tanto de tus logros como tú\ldots
-Además, la pareja quizás no sea para siempre, pero tu madre sí.
+Quiero agradecerle a mis hermanos y a mis padres la tremenda y abrumadora paciencia que han tenido conmigo durante toda la carrera y la realización de este proyecto, en especial a mi madre y a sus incansables recordatorios cada vez que pasaba de visita por su casa preguntándome si había empezado ya el TFG. Estoy convencido de que tanto ella como mi padre estarán mucho más contentos de lo que estaré yo (que ya será mucho) cuando por fin lo presente ante el tribunal.
 
+También quiero agradecerle a mis amigos su característica preocupación por el estado de mi título de ingeniero en forma de burlas hacia mi persona, pues me han enseñado indirectamente y de forma totalmente no intencionada a rebajar el estrés y la angustia que sentía al respecto. 
+Siguiendo la máxima de ``si no puedes vencerlos únete a ellos'', he acabado por convertirme en un auténtico icono del auto-vilipendio en clave de humor.
+
+Quiero dar las gracias también a mi pareja por apoyarme siempre, por ayudarme a centrarme, por soportarme cuando los nervios me atenazaban y por introducir en mi cabeza poco a poco, siguiendo los pasos mi madre, la idea de finalizar definitivamente lo que me quedaba pendiente para conseguir mi titulación.
+
+Por último, también quiero agradecer a mis compañeros de trabajo por su gran involucración y amabilidad a la hora de explicarme cada cosa que no entendía durante la realización del proyecto. He aprendido mucho con ellos y espero poder seguir haciéndolo.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Resumen
 
@@ -178,10 +184,15 @@ Empresas como Cisco, Skype o Mitel (entre otros) son grandes referentes en la im
 %\addcontentsline{toc}{chapter}{Summary} % si queremos que aparezca en el índice
 \markboth{SUMMARY}{SUMMARY} % encabezado
 
-Here comes a translation of the ``Resumen'' into English.
-Please, double check it for correct grammar and spelling.
-As it is the translation of the ``Resumen'', which is supposed to be written at the end, this as well should be filled out just before submitting.
+The main purpose of this memory is to present an on-premise collaboration solution based on Cisco UCS technology to host an IP telephony infrastructure, messaging services and Contact Center.
 
+This system consists mainly of a switchboard which will manage the logic of the VoIP (Voice over Internet Protocol) calls with Cisco tehcnology based on Call Manager and SIP protocol (Session Initiation Protocol). To achieve this goal, a virtualization enviroment has been disposed with VMWare technology, hosting the virtual machines all over the solution.
+
+This kind of structure is meant to attend the parallel needs of many enterprises in terms of telephone support. The logic that may hide behind the different elemments of the architecture offers an endless range of possibilities, so that an eficient and personalized management can be achieved.
+
+In a world more and more digitalized, the enterprises has been forced to offer a remote technical support, which can be telephonic, by chat or by e-mail. In this scope, the telephone assistance can establish a great option to improve the communication and eficiency on issues resolution, reaching a higher degree in customer satisfaction and becoming a highly valuable criteria when hiring a service or product.
+
+Many enterprises as Cisco, Skype or Mitel are huge referents on the integration of these services, which can also allow the internal communication between workers of the company without incurring a cost overrun.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -560,7 +571,6 @@ También existe la posibilidad de poner notas al pie de página, por ejemplo, un
 % DISEÑO E IMPLEMENTACIÓN %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\cleardoublepage
 \chapter{Diseño e implementación}
 
 De acuerdo a los contratos legales establecidos entre mi empresa (ejecutora del proyecto) y el cliente (receptora), no me está permitido hacer una reproducción de la solución con un detalle exacto, pero sí puedo definir de forma aproximada una arquitectura funcional similar, intentando reflejar todas mis tareas ejecutadas durante la instalación.
@@ -603,18 +613,17 @@ Los elementos implicados en la solución son los siguientes:
 
 En el siguiente diagrama, se muestra el flujo básico que siguen los dos tipos posibles de llamadas (tanto salientes como entrantes):
 \begin{enumerate}
-  \item Un \textbf{\textcolor{red}{cliente externo}} hace una llamada al número de atención telefónica. El proveedor enruta la llamada al gateway, que la redirige al Call Manager. En este momento, suceden varios flujos de ejecución:
-  \begin{itemize}
-    \item El Call Manager consulta con el Contact Center los agentes disponibles, el cual hace una asignación basada en ciertos criterios de la empresa, en conjunto con las opciones marcadas por el cliente en la locución de bienvenida si la hubiese (IVR o \emph{Interactive Voice Response}).
-    \item Comienza la comunicación entre la grabadora y el Call Manager, que acuerdan el inicio de la grabación en cuanto el agente descuelgue el teléfono y se establezca conexión, iniciando el tráfico RTP punto a punto.
-  \end{itemize}
+  \item Un \textbf{\textcolor{red}{cliente externo}} hace una llamada al número de atención telefónica. El proveedor enruta la llamada al gateway, que la redirige al Call Manager. Desde el Call Manager se enruta la llamada a través de un puerto virtual específico al Contact Center, el cual consulta los agentes disponibles y hace una asignación basada en ciertos criterios de la empresa en conjunto con las opciones marcadas por el cliente en la locución de bienvenida si la hubiese (IVR o \emph{Interactive Voice Response}).
+  
+  En el instante en el que un agente descuelga la llamada, el cliente software del agente \textbf{\textcolor{blue}{envía a la grabadora}} todo el tráfico RTP que se ha generado punto a punto, tanto el de origen suyo como el de origen del llamante externo, a través del SIP trunk que sale del Call Manager.
+  
   En caso de sentido contrario de llamada el agente marcará la numeración telefónica de un cliente externo, lo que provocará que el call manager enrute la llamada al gateway y éste la saque por el acceso primario al proveedor. En este momento, el proveedor consultará sus tablas de numeración y enlazará la llamada con el destino.
-  \item Un \textbf{\textcolor{green}{trabajador de una empresa}} a la que da soporte esta solución llama al servicio técnico. El Call Manager de esa misma empresa enruta la llamada hacia el extremo de su red, a través del cual se conecta con nuestro elemento de borde, el SBC. Dicho SBC enruta la llamada por medio de un SIP Trunk hacia nuestro Call Manager. En este momento, suceden los mismos flujos que en la anterior casuística ren relación al Call Manager:
+  \item Un \textbf{\textcolor{green}{trabajador de una empresa}} a la que da soporte esta solución llama al servicio técnico. El Call Manager de esa misma empresa enruta la llamada hacia el extremo de su red, a través del cual se conecta con nuestro elemento de borde, el SBC. Dicho SBC enruta la llamada por medio de un SIP Trunk hacia nuestro Call Manager. En este momento, suceden los mismos flujos que en la anterior casuística:
   \begin{itemize}
-    \item Asignación de agente mediante Contact Center.
-    \item Grabación de llamada a través de la grabadora al comienzo de la conversación.
+    \item Asignación de agente mediante Contact Center y establecimiento de sesión punto a punto.
+    \item Grabación de llamada \textbf{\textcolor{blue}{a través de la grabadora}} al comienzo de la conversación mediante el envío del flujo RTP por parte del cliente software del agente.
   \end{itemize}
-  En caso de sentido contrario de llamada el agente marcará la numeración telefónica del trabajador, lo que provoará que el call manager enrute la llamada al SBC y este conecte con el Call Manager de la otra empresa. A partir de ahí el flujo es opaco a nosotros, pero se supone que la lógica será igual o parecida a la nuestra.
+  En caso de sentido contrario de llamada el agente marcará la numeración telefónica del trabajador, lo que provocará que el call manager enrute la llamada al SBC y éste conecte con el Call Manager de la otra empresa. A partir de ahí el flujo es opaco a nosotros, pero es de suponer que la lógica será parecida a la nuestra.
 \end{enumerate}
 
 \begin{figure}[!]
@@ -749,7 +758,7 @@ En el Call Manager \emph{publisher} se han realizado los ajustes más importante
   \item \emph{Route Patterns}, que consisten en una cadena de dígitos y un conjunto de manipulaciones de dígitos que enrutan llamadas a un SIP Trunk. Estos patrones son muy útiles, pues brindan una gran flexibilidad en el diseño de la red. Además, trabajan en conjunto con filtros de ruta y listas de rutas para dirigir llamadas a dispositivos específicos y para incluir, excluir o modificar patrones de dígitos.
   \item Extensiones, que serán el número de teléfono interno de cada agente. Cada extensión estará asociada a un dispositivo, que será el PC con el que se conecte cada uno desde su localización. Cada dispositivo configurado consume una licencia de Call Manager, por lo que habrá tantas como agentes hubiera, teniendo en cuenta que cada uno utilizará únicamente su PC como dispositivo de registro.
   \item \emph{Music on Hold} y \emph{announcements}, que serán las locuciones de bienvenida y la música que se reproduzca cuando el llamante quede en espera a que un agente descuelgue.
-  \item \emph{CTI Route Point} (Computer Telephony Integration), 
+  \item \emph{CTI Route Point} (Computer Telephony Integration), que son los \emph{triggers} que enlazan una llamada entrante a un agente libre mediante un \emph{CTI port}. Se trata de una numeración corta resultado de una transformación de una numeración real (número de atención al cliente). Este \emph{CTI Route Point} está asociado a unos puertos CTI virtuales, a través de los cuales se enlaza la llamada con un agente.
   \item \emph{SIP Trunk} o troncal SIP, es una conexión virtual a través de internet que se crea entre dos elementos para el tráfico de voz, principalmente. Se ha creado uno hacia cada elemento que tiene un rol en el tráfico de voz, es decir: los gateways, SBCs, el CUCM IM\&P y la grabadora. En resumidas cuentas, a estos enlaces se les asocia una IP de destino y un perfil SIP, junto a otros aspectos como el método de entrega de DTMF (Dial Tone Multi Frecuency)\footnote{Tono que se genera al pulsar las teclas de marcado.} en RFC 2833. Esta especificación de entrega de DTMF establece un formato de payload de RTP para el soporte de marcación de dígitos, en este caso la marcacion a la que invitan las locuciones de bienvenida.
   \item Usuarios, que tendrán especificados el nombre y apellidos y las credenciales para loguearse a la plataforma. También tienen un dispositivo vinculado creado anteriormente, junto a dos extensiones: la interna y la IPCC, que será la asociada al Contact Center.
 \end{enumerate}
@@ -759,7 +768,53 @@ Cisco mediante Call Manager permite una gestión de los perfiles de usuario \emp
 \subsection{Contact Center}
 \label{sec:contact_center}
 
+El objetivo del Contact Center es manejar unos puertos virtuales que estarán permanentemente en escucha esperando que se reciba una llamada entrante y asociarla a un agente que esté disponible en ese momento, respentando pausas de unos segundos entre cada llamada (la cantidad de segundos de pausa se ha definido en base a preferencias de la empresa).
 
+Cada agente dispone de un usuario con unas características y \emph{skills} o habilidades definidas. Se les puede asignar un conocimiento, como por ejemplo inglés, y un nivel de experiencia en ese conocimiento, de manera que sirva de medida para encontrar el agente más adecuado a cada circunstancia.
+Al ser un servicio compartido con agentes en nómina de la empresa en la que se ha montado esta solución, muchas habilidades tendrán que ver con conocimientos concretos de varias empresas. Por ejemplo puede haber un agente que tenga habilidades de  información comercial de Heineken, postventa de Balay, información de producto de Telefónica, alemán\ldots
+
+Todos y cada uno de los clientes contratantes de este servicio tiene un número de atención telefónico asignado, el cual será transformado a la entrada del Call Manager a una numeración más corta de 4 dígitos llamada \emph{CTI Route Point} mediante las reglas establecidas en los \emph{Translation Patterns}. Esta numeración, también llamada \emph{trigger}, está asociada a una cantidad de puertos que se definen cuando se crea dicho \emph{trigger} (figura ~\ref{figura:fig_ctiports}). El número de puertos CTI virtuales de los que disponga este \emph{trigger} será el número máximo de llamadas paralelas que puede atender este cliente, por lo que cuanto mejor servicio contrate, más puertos simultáneos podrá disponer. 
+
+Es común que cada cliente puede disponer de varios \emph{triggers} orientados cada uno a un departamento en concreto, por ejemplo un \emph{trigger} dirigido a consultas de problemas informáticos, otro dirigido a consultas de postventa\ldots
+
+\begin{figure}
+  \centering
+  \includegraphics[scale = 0.85]{img/fig_ctiports}
+  \caption{Puertos asignados a un \emph{trigger}}
+  \label{figura:fig_ctiports}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale = 0.85]{img/fig_aplicacion}
+  \caption{Aplicación asociada a un \emph{trigger}}
+  \label{figura:fig_aplicacion}
+\end{figure}
+
+El \emph{trigger} está enlazado a una aplicación (figura ~\ref{figura:fig_aplicacion}), la cual define un script que se ejecutará para todos los puertos de este \emph{trigger}. Este script es el encargado, entre otra cosas, de:
+\begin{itemize}
+  \item Reproducir la locución de bienvenida.
+  \item Lanzar las opciones de marcado de dígito
+  \item En base a los dígitos marcados, buscar un agente que satisfaga los requisitos de habilidades y expertise.
+  \item De los agentes  filtrados, buscar el que esté disponible.
+  \item Asignar la llamada.
+  \item Recoger estadísticas.
+\end{itemize}
+
+
+En el ejemplo de la figura ~\ref{figura:fig_script} se puede ver una sección del script de un cliente en el que la llamada entra a la cola, se reproduce una locución que anuncia el comienzo de la cola y entonces comienza la lógica de búsqueda (función ``SelecciónRecursosCAU'', definida en otra sección del script) y asignación de agente.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[scale = 0.8]{img/fig_script}
+  \caption{Sección real de un script de asignación de recursos}
+  \label{figura:fig_script}
+\end{figure}
+
+Las posibilidades de estos scripts son muy extensas, llegando a poder, en el caso de uno de los clientes, asignar una extensión que conecte con el Contact Center e iniciar la grabación de un mensaje de voz para colocarlo automáticamente al inicio o al final de la locución de bienvenida con el objetivo de dar aviso de una incidencia masiva en el servicio. 
+Estas grabaciones pueden ser restringidas mediante el marcado de una contraseña, de modo que sólo los administradores puedan ejecutarlas.
+
+Aunque en este caso se han configurado en español, todas las locuciones se pueden cambiar de idioma si se desea, pues son lecturas de texto ejecutadas por sintetizadores de voz.
 
 \subsection{Gateway}
 \label{sec:gateway}
