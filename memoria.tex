@@ -253,7 +253,7 @@ La idea de que este proyecto fuera mi Trabajo Fin de Grado me pareció idónea p
 %\label{sec:seccion}
 Tras vivir recientemente una situación límite en muchos aspectos con la pandemia de la COVID-19, el modelo de negocio actual se ha visto obligado a adaptarse para integrar el trabajo remoto en el día a día a consecuencia de las medidas de restricción sanitarias que están teniendo lugar.
 Estas circunstancias han favorecido en gran medida el crecimiento de las soluciones de telefonía IP y colaboración, que ya habían sido objeto de estudio previamente por consultoras de análisis de mercados, %como \textit{Market and Research} o \textit{Global Market Insights}
-arrojando unos resultados prometedores de crecimiento entre los años 2017 y 2021 y previendo la continuación de dicha tendencia en los próximos años.
+arrojando unos resultados prometedores de crecimiento entre los años 2017 y 2021 y previendo la continuación de dicha tendencia en los próximos años~\cite{researchandmarkets}.
 
 Si bien hay distintas soluciones de telefonía IP pretenden lograr el mismo objetivo, podemos distinguir entre los dos métodos de integración que se pueden llevar a cabo actualmente:
 \begin{itemize}
@@ -274,7 +274,7 @@ Para el despliegue de estas tecnologías podemos distinguir entre empresas que o
 
   \item \textbf{Mitel}: Su solución \emph{MiContact Center Business}\footnote{\url{https://www.mitel.com/es-es/productos/aplicaciones/contact-center/micontact-center-business}}, a menudo de la mano con la centralita de Call Manager MiVoice MX-ONE, es una plataforma de nivel profesional para la gestión de experiencia del cliente omnicanal, diseñada para las empresas orientadas al cliente.
 
-  \item \textbf{Genesys}: Referente mundial en soluciones de CC y experiencia de cliente omnicanal. Presente en valoraciones Gartner de CCaaS (Contact Center as a Service) y UCaaS (Unified Communications as a Service).
+  \item \textbf{Genesys}: Referente mundial en soluciones de CC y experiencia de cliente omnicanal. Presente en valoraciones Gartner de CCaaS (Contact Center as a Service) y UCaaS (Unified Communications as a Service)~\cite{gartner:_magic_quadrant}.
 \end{itemize}
 
 \begin{figure}[h]
@@ -443,7 +443,7 @@ La tecnologías más usadas actualmente en telefonía IP son los protocolos SIP 
   \end{figure}
 \end{itemize}
 
-Los protocolos RTP (\emph{Real-time Transport Protocol}) y RTCP (\emph{Real Time Control Protocol}) involucrados en las sesiones SIP y H.323 son los responsables de la transmisión fiable de voz y vídeo a travez de Internet. RTP es el encargado de la transmisión de datos, mientras que RTCP proporciona informacion de control complementaria al flujo de datos RTP. Debido a su naturaleza, este protocolo utiliza UDP (\emph{User Datagram Protocol}) a nivel de transporte, pues necesita un flujo constante de datos y gran ancho de banda para reducir el tiempo de envío de los paquetes.
+Los protocolos RTP (\emph{Real-time Transport Protocol}) y RTCP (\emph{Real Time Control Protocol}) involucrados en las sesiones SIP y H.323 son los responsables de la transmisión fiable de voz y vídeo a travez de Internet. RTP es el encargado de la transmisión de datos, mientras que RTCP proporciona informacion de control complementaria al flujo de datos RTP. Debido a su naturaleza, este protocolo utiliza UDP (\emph{User Datagram Protocol}) a nivel de transporte, pues necesita un flujo constante de datos y gran ancho de banda para reducir el tiempo de envío de los paquetes~\cite{cisco:_video}.
 
 Para estas labores de envío de datos juegan un papel fundamental los códecs. El objetivo de un códec de audio es comprimir la señal para reducir la cantidad de bits a enviar, de manera que en la recepción se pueda descomprimir y obtener una señal lo más parecida posible a la original. Este proceso de codificar/decodificar facilita el envío de datos para conseguir una mayor cantidad de paquetes aprovechando el ancho de banda disponible.
 
@@ -472,7 +472,7 @@ Ambos protocolos son muy usados no obstante.
 \subsection{SIP}
 \label{sec:sip}
 
-Tomando como referencia protocolos con un gran recorrido y un buen historial de evolución como HTTP y SMTP, SIP ha basado la lógica de sus flujos de comunicación en una estructura de petición -$>$ respuesta. Este flujo de de comunicación Resquest/Response (como se puede ver en la Figura~\ref{figura:fig_phones}) utiliza los llamados \emph{métodos} SIP, compuestos por un grupo reducido de sencillas cabeceras con nombres muy intuitivos.
+Tomando como referencia protocolos con un gran recorrido y un buen historial de evolución como HTTP y SMTP, SIP~\cite{johnston2009sip} ha basado la lógica de sus flujos de comunicación en una estructura de petición -$>$ respuesta. Este flujo de de comunicación Resquest/Response (como se puede ver en la Figura~\ref{figura:fig_phones}) utiliza los llamados \emph{métodos} SIP, compuestos por un grupo reducido de sencillas cabeceras con nombres muy intuitivos.
 
 \begin{figure}[h]
   \centering
@@ -501,76 +501,30 @@ En la Figura~\ref{figura:fig_sip_flow} se puede ver un ejemplo de flujo SIP entr
   \item Cuando un agente desea colgar, envía una petición BYE al servidor, el cual la retransmitirá a Agente2. A Agente2 no le quedará otra que aceptar la finalización de sesión y devolver una respuesta 200 OK, retransmitida a Agente1.
 \end{enumerate}
 
-\begin{figure}
+\begin{figure}[h]
   \centering
   \includegraphics{img/fig_sip_flow}
   \caption{Flujo básico SIP}
   \label{figura:fig_sip_flow}
 \end{figure}
 
-
-
-
 \subsection{Tecnologías complementarias}
 \label{sec:tecnologias-complementarias}
-Junto a SIP, Cisco usa un protocolo propietario de control de terminal, nombrado Skinny Call Control Protocol (SCCP) comúnmente llamado Skinny, para la comunicación entre el Call Manager y clientes ligeros, tales como los teléfonos IP. Este protocolo fue desarrollado inicialemente por Selsius Corporation, empresa adquirida por Cisco en 1998. La labor de este protocolo ha quedado relegada a una cantidad pequeña de tareas, como la especificacion de recrusos de media o la comunicación opcional con equipos analógicos. \\Actualmente, todos los nuevos teléfonos IP funcionan con SIP.
-\\
+Junto a SIP, Cisco usa un protocolo propietario de control de terminal desarrollado en 1998, nombrado Skinny Call Control Protocol (SCCP) y comúnmente llamado Skinny, para la comunicación entre el Call Manager y clientes ligeros, tales como los teléfonos IP (figura ~\ref{figura:fig_skinny}). La labor de este protocolo ha quedado relegada a una cantidad pequeña de tareas, como la especificacion de recrusos de media o la comunicación opcional con equipos analógicos. Actualmente, todos los nuevos teléfonos IP funcionan con SIP.
 
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
   \includegraphics{img/fig_skinny}
   \caption{Flujo de comunicación por SCCP}
   \label{figura:fig_skinny}
 \end{figure}
 
-
--------------------------------------------------------------
-
-Puedes citar libros, como el de Bonabeau et al., sobre procesos estigmérgicos~\cite{Cisco:_video}.
-Me encantan los procesos estigmérgicos.
-Deberías leer más sobre ellos.
-Pero quizás no ahora, que tenemos que terminar la memoria para sacarnos por fin el título.
-Nota que el \~ \ añade un espacio en blanco, pero no deja que exista un salto de línea.
-Imprescindible ponerlo para las citas.
-
-Citar es importantísimo en textos científico-técnicos.
-Porque no partimos de cero.
-Es más, partir de cero es de tontos; lo suyo es aprovecharse de lo ya existente para construir encima y hacer cosas más sofisticadas.
-¿Dónde puedo encontrar textos científicos que referenciar?
-Un buen sitio es Google Scholar: {http://scholar.google.com}.
-Por ejemplo, si buscas por ``stigmergy libre software'' para encontrar trabajo sobre software libre y el concepto de \emph{estigmergia} (¿te he comentado que me gusta el concepto de estigmergia ya?), encontrarás un artículo que escribí hace tiempo cuyo título es ``Self-organized development in libre software: a model based on the stigmergy concept''.
-Si pulsas sobre las comillas dobles (entre la estrella y el ``citado por ...'', justo debajo del extracto del resumen del artículo, te saldrá una ventana emergente con cómo citar.
-Abajo a la derecha, aparece un enlace BibTeX.
-Púlsalo y encontrarás la referencia en formato BibTeX, tal que así:
-
-{\footnotesize
-\begin{verbatim}
-@inproceedings{robles2005self,
-  title={Self-organized development in libre software:
-         a model based on the stigmergy concept},
-  author={Robles, Gregorio and Merelo, Juan Juli\'an
-          and Gonz\'alez-Barahona, Jes\'us M.},
-  booktitle={ProSim'05},
-  year={2005}
-}
-\end{verbatim}
-}
-
-Copia el texto en BibTeX y pégalo en el fichero \texttt{memoria.bib}, que es donde están las referencias bibliográficas.
-Para incluir la referencia en el texto de la memoria, deberás citarlo, como hemos hecho antes con~\cite{bonabeau:_swarm}, lo que pasa es que en vez de el identificador de la cita anterior (bonabeau:\_swarm), tendrás que poner el nuevo (robles2005self).
-Compila el fichero \texttt{memoria.tex} (\texttt{pdflatex memoria.tex}), añade la bibliografía (\texttt{bibtex memoria.aux}) y vuelve a compilar \texttt{memoria.tex} (\texttt{pdflatex memoria.tex})\ldots y \emph{voilà} ¡tenemos una nueva cita~%\cite{robles2005self}!
-
-También existe la posibilidad de poner notas al pie de página, por ejemplo, una para indicarte que visite la página del GSyC\footnote{\url{http://gsyc.es}}.
-
-
--------------------------------------------------------------
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DISEÑO E IMPLEMENTACIÓN %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\cleardoublepage
 \chapter{Diseño e implementación}
 
 De acuerdo a los contratos legales establecidos entre mi empresa (ejecutora del proyecto) y el cliente (receptora), no me está permitido hacer una reproducción de la solución con un detalle exacto, pero sí puedo definir de forma aproximada una arquitectura funcional similar, intentando reflejar todas mis tareas ejecutadas durante la instalación.
@@ -578,7 +532,7 @@ De acuerdo a los contratos legales establecidos entre mi empresa (ejecutora del 
 \section{Arquitectura general}
 \label{sec:arquitectura}
 
-En la figura ~\ref{figura:fig_arquitectura} se muestra un esquema simplificado de la solución, presentando cuatro zonas delimitadas. 
+En la figura ~\ref{figura:fig_arquitectura} se muestra un esquema simplificado de la solución, presentando cuatro zonas delimitadas~\cite{cisco:_ccna}.
 
 Empezando desde arriba, la primera zona representa la red pública de telefonía (PSTN), desde la que una persona puede realizar una llamada desde su teléfono móvil o fijo al número de atención al cliente definido para la entrada al sistema. También tenemos una pequeña nube representando el \emph{Busines to Business}, que en este caso son empresas con su propia red de telefonía privada conectadas a la solución de este proyecto mediante un elemento intermedio de control de fronteras: el SBC.
 
@@ -586,9 +540,11 @@ En la segunda zona, sobrepasando el primer borde de control, podemos diferenciar
 \begin{itemize}
   \item Capa de conectividad, donde están ubicados el Gateway de voz y el SBC, ambos elementos físicos. Sus funciones serán enrutar las llamadas hacia la PSTN (a través del Gateway) y enviar las llamadas a los clientes ubicados en las redes privadas de los clientes (a través del SBC).
   \item Capa de servicios, donde se encuentran los servidores físicos que almacenan las máquinas virtuales de estos elementos. Sus funciones serán aplicar, entre otras, toda la lógica de gestión de llamadas entrantes y salientes, la configuración necesaria de interconexionado entre máquinas o las grabaciones de usuarios. El elemento más importante aquí es el Call Manager, que interactúa directamente con el resto de elementos.
-  \item En la tercera zona, delimitada por dos firewalls y llamada también Zona Desmilitarizada (DMZ), se encuentra un servidor proxy propietario de Cisco con funciones especiales, ya que es el elemento que hace posible el login a la plataforma desde ubicaciones externas a la red privada por parte de los agentes. Esta zona está especialmente diseñada para alojar proxys en su interior, pues tiene la característica de permitir tráfico hacia el exterior pero bloquearlo hacia la red interna. Podría decirse que es como el jardín de una casa, donde se pueden colocar ciertos objetos, pero los de mayor valor se guardan dentro.
-  \item Por último, al otro lado del firewall externo, se encuentra la red de Internet. Los agentes se encuentran en esta zona y hacen login a la plataforma desde su domicilio o desde su oficina de trabajo.
 \end{itemize}
+
+En la tercera zona, delimitada por dos firewalls y llamada también Zona Desmilitarizada (DMZ), se encuentra un servidor proxy propietario de Cisco con funciones especiales, ya que es el elemento que hace posible el login a la plataforma desde ubicaciones externas a la red privada por parte de los agentes. Esta zona está especialmente diseñada para alojar proxys en su interior, pues tiene la característica de permitir tráfico hacia el exterior pero bloquearlo hacia la red interna. Podría decirse que es como el jardín de una casa, donde se pueden colocar ciertos objetos, pero los de mayor valor se guardan dentro.
+
+Por último, al otro lado del firewall externo, se encuentra la red de Internet. Los agentes se encuentran en esta zona y hacen login a la plataforma desde su domicilio o desde su oficina de trabajo.
 
 \section{Diagrama general}
 \label{sec:diagrama}
@@ -663,7 +619,7 @@ Servicios que han sido desplegados:
   
   También se ha instalado en este sistema una base de datos Microsoft SQL Server, que se explicará más adelante cuál es su utilidad.
 
-  \item \textbf{Certificate Authority (CA)}. Una Autoridad de certificación es una entidad de confianza, responsable de emitir y revocar los certificados digitales. Un certificado es un archivo que contiene el nombre del titular del certificado, la clave pública y la firma digital de la autoridad certificadora que emite el certificado, que prueba la identidad del propietario del certificado. 
+  \item \textbf{Certificate Authority (CA)}. Una Autoridad de Certificación es una entidad de confianza, responsable de emitir y revocar los certificados digitales. Un certificado es un archivo que contiene el nombre del titular del certificado, la clave pública y la firma digital de la autoridad certificadora que emite el certificado, que prueba la identidad del propietario del certificado. 
   Mediante dichos documentos, los distintos elementos de la solución confiarán entre ellos al validar sus identidades y la comunicación será segura.
   Esta CA se ha configurado en un SO CentOS, que es una distribucion de Linux de código abierto.
   Este elemento se ha desplegado con unas especificaciones poco exigentes pero con bastante almacenamiento pues su obejtivo será, ademas de actuar de entidad certificadora, el de almacenar los datos de los chats persistentes y las imágenes que los agentes se envíen entre sí.
@@ -689,8 +645,8 @@ Servicios que han sido desplegados:
 \label{sec:grabadora}
 Se ha instalado un software de terceros que se integra con la solución de colaboración de Cisco, y que tiene acceso vía web. El panel de la grabadora proporciona una descripción completa de las llamadas por día, la duración promedio de las llamadas, las llamadas activas actuales, etc. Dicha interfaz almacena estadísticas muy detalladas (figuras ~\ref{figura:fig_portada_recorder}, ~\ref{figura:fig_grabaciones} y ~\ref{figura:fig_grabaciones_02}) que pueden ser utilizadas para una exportación con criterios de búsqueda muy ajustados.
 
-Por ejemplo, en la figura ~\ref{figura:fig_filtros} está programada una búsqueda que aúna tres criterios: que las llamadas sean posteriores al 1 de junio de 2022, que superen los 10 minutos de duración y que sean entrantes. 
-De esa manera, podemos localizar a los agentes que se estén excediendo del tiempo límite y darles una colleja.
+Por ejemplo, en la figura ~\ref{figura:fig_filtros} está programada una búsqueda que aúna tres criterios: que las llamadas sean posteriores al 1 de junio de 2022, que superen los 10 minutos de duración y que sean entrantes.
+De esa manera, podemos localizar a los agentes que se estén excediendo reinicidentemente del tiempo límite y echarles un rapapolvo.
 Estas combinaciones para las búsquedas pueden guardarse con un nombre identificativo y ahorrar mucho tiempo y trabajo en posteriores aplicaciones del mismo filtro.
 
 \begin{figure}[h!]
@@ -743,23 +699,23 @@ Se pueden separar las configuraciones realizadas en dos partes:
 
 La solución cuenta con varios Call Manager:
 \begin{itemize}
-  \item CUCM (Cisco Unified Call Manager). Entre todos los que hay instalados, uno es el que tiene el papel principal y actúa de \emph{master}o también llamado \emph{publisher}. En él se realizarán los cambios, que serán propagados al resto de Call Managers. Además, hay otros dos CUCM más que actúan de \emph{subscriber}, redundando así la solución para tener mayor capacidad de usuarios y llamadas y también ganar robustez frente a caídas de servicio.
+  \item CUCM (Cisco Unified Call Manager). Entre todos los que hay instalados, uno es el que tiene el papel principal y actúa de \emph{master}, también llamado \emph{publisher}. En él se realizarán los cambios, que serán propagados al resto de Call Managers. Además, hay otros dos CUCM más que actúan de \emph{subscriber}, redundando así la solución para tener mayor capacidad de usuarios y llamadas y también ganar robustez frente a caídas de servicio.
   \item CUCM IM\&P (Cisco Unified Call Manager Instant Messaging and Presence), que son los encargados de proveer del servicio de presencia en la aplicación de mensajería (offline, online, ausente...) mediante el protocolo XMPP (\emph{Extensible Messaging and Presence Protocol}). También existen varios para redundancia, aunque al tratarse de una versión alternativa de Call Manager, ambos actúan como \emph{subscribers}.
-  Es en estos elementos donde se habilita la mensajería instantánea entre agentes de la organización. Para añadir la característica de chat persistente (que se mantenga entre sesiones), se ha integrado la base de datos SQL Server que se desplegó en el servidor de Windows y también se ha configurado una ruta de la máquina con CentOS para el almacenamiento de imágenes, texto y metadatos.
+  Es en estos elementos donde se habilita la mensajería instantánea entre agentes de la organización mediante el aplicativo Jabber. Para añadir la característica de chat persistente (que se mantenga entre sesiones), se ha integrado la base de datos SQL Server que se desplegó en el servidor de Windows y también se ha configurado una ruta de la máquina con CentOS para el almacenamiento de imágenes, texto y metadatos.
 \end{itemize}
 
 \subsubsection{Configuraciones}
 \label{sec:conf_cucm}
 En el Call Manager \emph{publisher} se han realizado los ajustes más importantes y esenciales para el funcionamiento del entorno. A continuación se enumeran los más importantes y su propósito:
 \begin{enumerate}
-  \item Activación de servicios, tales como el DHCP que provee de IP automáticamente a los agentes que se registran o el TFTP que provee de la última actualización de software a los dispositivos de cisco, entre otros muchos servicios.
+  \item Activación de servicios, tales como el DHCP (\emph{Dynamic Host Configuration Protocol}) que provee de IP automáticamente a los agentes que se registran o el TFTP (\emph{Trivial File Transfer Protocol}) que provee de la última actualización de software a los dispositivos de cisco, entre otros muchos servicios.
   \item \emph{Device Pools}, que establecen un orden de prioridad entre todos los Call Manager de la solución sobre los que se registrarán los agentes. De esta manera se balancea la carga de usuarios y se podrá liberar opcionalmente el publisher de capacidad de procesamiento, ya que será el que se ocupará de alojar los servicios más importantes.
   \item Particiones y \emph{Calling Search Spaces}, que identifican cada agente en un grupo determinado con una serie de privilegios de llamada concretos.
   \item \emph{Route Patterns}, que consisten en una cadena de dígitos y un conjunto de manipulaciones de dígitos que enrutan llamadas a un SIP Trunk. Estos patrones son muy útiles, pues brindan una gran flexibilidad en el diseño de la red. Además, trabajan en conjunto con filtros de ruta y listas de rutas para dirigir llamadas a dispositivos específicos y para incluir, excluir o modificar patrones de dígitos.
   \item Extensiones, que serán el número de teléfono interno de cada agente. Cada extensión estará asociada a un dispositivo, que será el PC con el que se conecte cada uno desde su localización. Cada dispositivo configurado consume una licencia de Call Manager, por lo que habrá tantas como agentes hubiera, teniendo en cuenta que cada uno utilizará únicamente su PC como dispositivo de registro.
   \item \emph{Music on Hold} y \emph{announcements}, que serán las locuciones de bienvenida y la música que se reproduzca cuando el llamante quede en espera a que un agente descuelgue.
   \item \emph{CTI Route Point} (Computer Telephony Integration), que son los \emph{triggers} que enlazan una llamada entrante a un agente libre mediante un \emph{CTI port}. Se trata de una numeración corta resultado de una transformación de una numeración real (número de atención al cliente). Este \emph{CTI Route Point} está asociado a unos puertos CTI virtuales, a través de los cuales se enlaza la llamada con un agente.
-  \item \emph{SIP Trunk} o troncal SIP, es una conexión virtual a través de internet que se crea entre dos elementos para el tráfico de voz, principalmente. Se ha creado uno hacia cada elemento que tiene un rol en el tráfico de voz, es decir: los gateways, SBCs, el CUCM IM\&P y la grabadora. En resumidas cuentas, a estos enlaces se les asocia una IP de destino y un perfil SIP, junto a otros aspectos como el método de entrega de DTMF (Dial Tone Multi Frecuency)\footnote{Tono que se genera al pulsar las teclas de marcado.} en RFC 2833. Esta especificación de entrega de DTMF establece un formato de payload de RTP para el soporte de marcación de dígitos, en este caso la marcacion a la que invitan las locuciones de bienvenida.
+  \item \emph{SIP Trunk} o troncal SIP, es una conexión virtual a través de internet que se crea entre dos elementos para el tráfico de voz, principalmente. Se ha creado uno hacia cada elemento que tiene un rol en el tráfico de voz, es decir: los gateways, SBCs, el CUCM IM\&P y la grabadora. En resumidas cuentas, a estos enlaces se les asocia una IP de destino y un perfil SIP, junto a otros aspectos como el método de entrega de DTMF (\emph{Dial Tone Multi Frecuency})\footnote{Tono que se genera al pulsar las teclas de marcado.} en RFC 2833. Esta especificación de entrega de DTMF~\cite{rfc2833} establece un formato de payload de RTP para el soporte de marcación de dígitos, en este caso la marcacion a la que invitan las locuciones de bienvenida.
   \item Usuarios, que tendrán especificados el nombre y apellidos y las credenciales para loguearse a la plataforma. También tienen un dispositivo vinculado creado anteriormente, junto a dos extensiones: la interna y la IPCC, que será la asociada al Contact Center.
 \end{enumerate}
 
@@ -819,7 +775,7 @@ Aunque en este caso se han configurado en español, todas las locuciones se pued
 \subsection{Gateway}
 \label{sec:gateway}
 
-El proveedor de telefonía ha provisto de un enlace Primario o E1 con un ancho de banda total de 2048Kbps, que consta de 32 canales E0 a 64Kbps, debido a la codificación G.711. De esos 32 canales, 2 son para señalizacion y 30 están destinados a datos. 
+El proveedor de telefonía ha provisto de un enlace Primario o E1 con un ancho de banda total de 2048Kbps, que consta de 32 canales E0 a 64Kbps, debido a la codificación G.711~\cite{itu}. De esos 32 canales, 2 son para señalizacion y 30 están destinados a datos. 
 Esta velocidad de 64K parte del criterio de Nyquist, en donde se formula que para recuperar de forma digital una señal analógica y muestrearla correctamente debemos hacerlo a una tasa dos veces superior al ancho de banda. 
 Con un ancho de banda de la señal analógica de 4KHz se debe muestrear a 8KHz, que usando 8 bits por muestra da el resultado de 64Kbps.
 
@@ -994,7 +950,7 @@ Al tratarse de un proyecto real, es compromiso de la empresa llevar a buen puert
 \section{Aplicación de lo aprendido}
 \label{sec:aplicacion}
 
-En este proyecto he aplicado muchos conocimientos que disponía de la asignatura de \textbf{Protocolos de transmisión de audio y vídeo}.
+En este proyecto he aplicado muchos conocimientos que disponía de la asignatura de \textbf{Protocolos para la Transmisión de Audio y Vídeo en Internet}, pues de todas las asignaturas que he cursado en mi Grado ésta es la que más útil me ha resultado y de la que he podido extraer más enseñanzas a aplicar en esta solución.
 
 \section{Lecciones aprendidas}
 \label{sec:lecciones_aprendidas}
